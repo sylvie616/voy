@@ -20,13 +20,13 @@ The project uses a medallion-style build:
 - Intermediate: business logic, interval validation, date spine, and cohort assignment
 - Marts: dimension and fact tables for downstream analysis and BI consumption
 
-## Source files
+## Source data
 
-The project loads the following seed files:
+Raw source tables are loaded in BigQuery (`voy-task.lz_ae_task`):
 
-- `customers.csv` — customer master data
-- `acq_orders.csv` — acquisition taxonomy / customer category mapping
-- `activity.csv` — customer subscription lifecycle activity with start and end dates
+- `customers` — customer master data
+- `acq_orders` — acquisition taxonomy / customer category mapping
+- `activity` — customer subscription lifecycle activity with start and end dates
 
 ## Model summary
 
