@@ -14,6 +14,7 @@ with valid_intervals as (
 ),
 ordered_intervals as (
     -- purpose: preserve chronology within each subscription; why: repeated subscription IDs may represent multiple distinct periods, which must be split into activity islands.
+    -- note: BigQuery sorts NULLs last in ORDER BY ASC, so open intervals (end_date IS NULL) appear after all closed ones — this is intentional and ensures the open period is processed last.
     select
         *,
         lag(end_date) over (
@@ -50,6 +51,8 @@ period_agg as (
         customer_id,
         subscription_id,
         min(start_date) as start_date,
+        -- note: BigQuery MAX() ignores NULLs, so if any row in this period group has end_date IS NULL (open subscription),
+        -- max(end_date) returns the highest non-null end_date or NULL if all rows are open — correctly reflecting the open state.
         max(end_date) as end_date,
         max(case when end_date is null then 1 else 0 end) as is_current,
         count(*) as activity_rows

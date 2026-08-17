@@ -14,7 +14,7 @@ clean-targets: ["target", "dbt_packages"]
 models:
   voy:
     +materialized: table
-    +dataset: dbt_dev
+    +dataset: "{{ env_var('DBT_DATASET', 'dbt_dev') }}"
     staging:
       +materialized: view
     intermediate:

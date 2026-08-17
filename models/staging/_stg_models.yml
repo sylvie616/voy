@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: stg_customers
-    description: Cleaned customer dimension seeded from the raw customer file. This model standardizes country names, trims whitespace, and resolves duplicate customer IDs through a deterministic precedence rule so downstream customer-level analysis is stable and auditable.
+    description: Cleaned customer dimension sourced from the BigQuery landing zone (voy-task.lz_ae_task.customers). This model standardizes country names, trims whitespace, and resolves duplicate customer IDs through a deterministic precedence rule so downstream customer-level analysis is stable and auditable.
     columns:
       - name: customer_id
         description: Stable customer identifier used to join the customer dimension to acquisition and activity data.
@@ -11,8 +11,6 @@ models:
           - unique
       - name: customer_country
         description: Normalized customer country value mapped to the canonical VOY dimension values.
-      - name: loaded_at
-        description: Timestamp of the load used for lineage checks and tie-breaking during duplicate resolution.
 
   - name: stg_acq_orders
     description: Cleaned acquisition-category model keyed at customer level. The model standardizes category strings and resolves duplicate customer-taxonomy rows using a deterministic, reviewable precedence rule so category assignments remain consistent for marketing analysis.
@@ -41,6 +39,10 @@ models:
         description: Subscription end date, where present. Empty or null values represent open or ongoing intervals.
       - name: is_valid_interval
         description: Flag used to separate valid and invalid activity intervals before retention logic is applied.
+      - name: is_zero_duration
+        description: Flag indicating the subscription started and ended on the same day; may represent a trial cancellation and is exposed for analyst review.
+      - name: is_from_date_parse_error
+        description: Flag set to 1 when from_date contained a non-null value that could not be parsed as a YYYY-MM-DD date; used to detect source format drift.
 
   - name: stg_activity_quarantine
     description: Exception model for malformed, invalid, or orphaned subscription records. This model is used for operational review and does not feed active-state or retention metrics.

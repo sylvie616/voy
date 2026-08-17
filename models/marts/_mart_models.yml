@@ -23,7 +23,7 @@ models:
         description: Current aggregate active-state used for high-level customer segmentation.
 
   - name: dim_date
-    description: Time dimension used across the reporting layer. This table provides the canonical calendar fields used for cohort curves, trend analysis, and time-based reporting, with weekend flags aligned to DuckDB's `dayofweek` mapping (Saturday and Sunday are treated as weekend days).
+    description: Time dimension used across the reporting layer. This table provides the canonical calendar fields used for cohort curves, trend analysis, and time-based reporting, with weekend flags aligned to BigQuery's EXTRACT(DAYOFWEEK) convention (1=Sunday, 7=Saturday).
     columns:
       - name: date_day
         description: Day-level date key.

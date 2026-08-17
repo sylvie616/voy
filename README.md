@@ -16,7 +16,7 @@ The goal is not simply to reshape three files into a reporting table. Instead, t
 
 The project uses a medallion-style build:
 
-- Staging: source-aligned, cleaned 1:1 representations of the raw seeds
+- Staging: source-aligned, cleaned 1:1 representations of the raw BigQuery source tables
 - Intermediate: business logic, interval validation, date spine, and cohort assignment
 - Marts: dimension and fact tables for downstream analysis and BI consumption
 
@@ -86,7 +86,7 @@ The project is designed around a small set of core metrics that are reusable acr
 
 ### Active Customers
 
-**Definition:** Count of customers with `is_active_on_date = 1` on a given date.
+**Definition:** Count of distinct customers with `is_active_on_date = 1` on a given date — i.e. customers with a valid subscription window covering that day.
 
 **Purpose:** Tracks customer health over time and reveals onboarding and retention cliffs.
 
@@ -94,9 +94,11 @@ The project is designed around a small set of core metrics that are reusable acr
 
 ### Active Subscribers
 
-**Definition:** Daily or rolling count of customers who are active according to the binary customer activity rule, regardless of how many subscriptions they hold.
+**Definition:** Count of customers with at least one open subscription (`has_open_subscription = 1` in `dim_customer`) — i.e. a subscription where `to_date IS NULL` as of the current date.
 
-**Purpose:** Represents the cleanest operational and executive measure of customer engagement.
+**Difference from Active Customers:** Active Customers is a point-in-time daily measure across the full history; Active Subscribers is a current-state snapshot based on open intervals only.
+
+**Source:** `dim_customer`
 
 ### Retention Rate
 
@@ -112,7 +114,11 @@ The project is designed around a small set of core metrics that are reusable acr
 
 **Definition:** Share of customers who are no longer active within a defined period relative to the prior active base.
 
+**Formula:** `1 - (active_customers_end_of_period / active_customers_start_of_period)`
+
 **Purpose:** Indicates whether the business is retaining customers through key lifecycle moments.
+
+**Source:** `fct_customer_daily`
 
 ### New Customers
 
