@@ -3,14 +3,14 @@
   Why: acquisition category is a major segmentation axis for marketing quality and retention analysis, so it must be standardized and deduplicated before use.
 */
 with source as (
-    -- source: raw acquisition taxonomy seed; purpose: preserve the original data before normalization.
+    -- source: BigQuery landing zone; purpose: preserve the original data before normalization.
     select *
-    from {{ ref('acq_orders') }}
+    from {{ source('lz_ae_task', 'acq_orders') }}
 ),
 normalized as (
     -- purpose: trim keys and category values; why: avoids whitespace and casing artifacts that distort segmentation.
     select
-        trim(cast(customer_id as varchar)) as customer_id,
+        trim(cast(customer_id as string)) as customer_id,
         nullif(trim(taxonomy_business_category_group), '') as taxonomy_business_category_group
     from source
 ),

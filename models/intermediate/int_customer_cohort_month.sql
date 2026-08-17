@@ -4,6 +4,6 @@
 */
 select
     customer_id,
-    date_trunc('month', first_seen_date) as cohort_month
+    date_trunc(first_seen_date, month) as cohort_month
 from {{ ref('int_customer_master') }}
 where first_seen_date is not null

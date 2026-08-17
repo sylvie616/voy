@@ -28,7 +28,7 @@ period_islands as (
         *,
         case
             when previous_end_date is null then 1
-            when start_date > previous_end_date + interval 1 day then 1
+            when start_date > date_add(previous_end_date, interval 1 day) then 1
             else 0
         end as is_new_period
     from ordered_intervals
@@ -63,8 +63,8 @@ select
     end_date,
     case when is_current = 1 then true else false end as is_active,
     case
-        when end_date is null then datediff('day', start_date, current_date)
-        else datediff('day', start_date, end_date)
+        when end_date is null then date_diff(current_date, start_date, day)
+        else date_diff(end_date, start_date, day)
     end as duration_days,
     activity_rows
 from period_agg

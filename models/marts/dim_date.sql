@@ -9,7 +9,7 @@ select
     calendar_day,
     month_start_date,
     case
-        when extract(dayofweek from date_day) in (0, 6) then true
+        when extract(dayofweek from date_day) in (1, 7) then true
         else false
     end as is_weekend
 from {{ ref('int_date_spine') }}

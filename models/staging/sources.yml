@@ -1,0 +1,47 @@
+version: 2
+
+sources:
+  - name: lz_ae_task
+    description: >
+      Raw landing zone tables loaded into BigQuery (project: voy-task, dataset: lz_ae_task).
+      These are the source-of-truth extracts for the VOY retention analytics pipeline.
+    database: voy-task
+    schema: lz_ae_task
+    tables:
+      - name: customers
+        description: One row per customer. Contains customer_id and customer_country.
+        columns:
+          - name: customer_id
+            description: Unique customer identifier (string).
+            tests:
+              - not_null
+          - name: customer_country
+            description: Country of the customer (may be null or inconsistently cased in raw data).
+
+      - name: acq_orders
+        description: One row per customer acquisition order. Maps customer_id to an acquisition taxonomy category.
+        columns:
+          - name: customer_id
+            description: Foreign key to customers.
+            tests:
+              - not_null
+          - name: taxonomy_business_category_group
+            description: Acquisition channel / category group (may be null in raw data).
+
+      - name: activity
+        description: One row per subscription interval. Defines the start and end date of each active subscription period.
+        columns:
+          - name: customer_id
+            description: Foreign key to customers.
+            tests:
+              - not_null
+          - name: subscription_id
+            description: Unique identifier for each subscription period.
+            tests:
+              - not_null
+          - name: from_date
+            description: Start date of the subscription interval.
+            tests:
+              - not_null
+          - name: to_date
+            description: End date of the subscription interval (NULL means open/active).

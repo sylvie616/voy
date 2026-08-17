@@ -53,7 +53,7 @@ final as (
         is_active_customer,
         coalesce(is_active_on_date, 0) as is_active_on_date,
         coalesce(subscription_count_on_date, 0) as subscription_count_on_date,
-        datediff('day', first_seen_date, date_day) as days_since_first_activity,
+        date_diff(date_day, first_seen_date, day) as days_since_first_activity,
         case when date_day = first_seen_date then 1 else 0 end as is_new_customer,
         case when is_active_on_date = 1 then 0 else 1 end as is_inactive_on_date,
         case when is_active_customer = 1 and is_active_on_date = 1 then 1 else 0 end as is_currently_active_customer

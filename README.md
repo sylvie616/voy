@@ -141,9 +141,42 @@ The project includes dbt tests for:
 - relationship-level sanity checks
 - date-based validity checks
 
-## Production interpretation
+## Setup and running
 
-In a production environment, this design would be deployed to BigQuery or an equivalent warehouse while preserving the same model logic. The local DuckDB setup is intended for rapid validation and interview-style prototyping.
+### Prerequisites
+
+- Python 3.11+
+- dbt-bigquery (`pip install dbt-bigquery`)
+- Google Cloud SDK (gcloud CLI): https://cloud.google.com/sdk/docs/install-sdk#windows
+
+### Authentication (one-time)
+
+This project uses Application Default Credentials (ADC) — no service account key files are required or stored in this repo.
+
+Run the following once to authenticate:
+
+```
+gcloud auth application-default login
+```
+
+Log in with the Google account that has BigQuery access to the `voy-task` project. Credentials are stored locally on your machine only.
+
+### Warehouse
+
+- GCP project: `voy-task`
+- Landing zone dataset: `lz_ae_task` (source tables: `customers`, `acq_orders`, `activity`)
+- Output dataset: `dbt_dev` (models are materialized here)
+- Location: `EU`
+
+### Running the project
+
+```
+dbt deps
+dbt debug
+dbt build
+```
+
+---
 
 ## Why this design
 

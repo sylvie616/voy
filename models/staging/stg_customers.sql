@@ -3,14 +3,14 @@
   Why: customer_id is the core business key and must be cleaned, deduplicated, and standardized before it can be trusted in downstream retention logic.
 */
 with source as (
-    -- source: raw customer seed; purpose: preserve the original rows before standardization and deduplication.
+    -- source: BigQuery landing zone; purpose: preserve the original rows before standardization and deduplication.
     select *
-    from {{ ref('customers') }}
+    from {{ source('lz_ae_task', 'customers') }}
 ),
 normalized as (
     -- purpose: trim whitespace and normalize country values; why: avoids casing and formatting drift across upstream files.
     select
-        trim(cast(customer_id as varchar)) as customer_id,
+        trim(cast(customer_id as string)) as customer_id,
         nullif(trim(customer_country), '') as customer_country,
         current_timestamp as loaded_at
     from source

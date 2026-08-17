@@ -15,6 +15,7 @@ clean-targets: ["target", "dbt_packages"]
 models:
   voy:
     +materialized: table
+    +dataset: dbt_dev
     staging:
       +materialized: view
     intermediate:
@@ -22,8 +23,5 @@ models:
     marts:
       +materialized: table
 
-seeds:
-  voy:
-    +quote_columns: false
 flags:
   require_generic_test_arguments_property: true

@@ -14,14 +14,14 @@ monthly_activity as (
     -- purpose: count active customers for each cohort at each month offset; why: this creates the retention curve needed for stakeholder dashboards and KPI analysis.
     select
         c.cohort_month,
-        datediff('month', c.cohort_month, f.date_day) as month_index,
+        date_diff(date_trunc(f.date_day, month), c.cohort_month, month) as month_index,
         count(distinct f.customer_id) as active_customers
     from {{ ref('int_customer_cohort_month') }} c
     -- INNER JOIN: only retain active customer-day rows that belong to a valid cohort; the cohort lookup is required for retention calculation.
     inner join {{ ref('fct_customer_daily') }} f
         on f.customer_id = c.customer_id
     where f.is_active_on_date = 1
-    group by c.cohort_month, datediff('month', c.cohort_month, f.date_day)
+    group by c.cohort_month, date_diff(date_trunc(f.date_day, month), c.cohort_month, month)
 )
 select
     ma.cohort_month,

@@ -3,17 +3,17 @@
   Why: retention analysis depends on trustworthy date windows; malformed intervals must be flagged before they are used in customer-day or cohort logic.
 */
 with source as (
-    -- source: raw subscription activity seed; purpose: preserve original record structure before working with dates or business rules.
+    -- source: BigQuery landing zone; purpose: preserve original record structure before working with dates or business rules.
     select *
-    from {{ ref('activity') }}
+    from {{ source('lz_ae_task', 'activity') }}
 ),
 normalized as (
     -- purpose: coerce IDs and dates to clean typed values; why: date comparisons require consistent DATE values and trimmed strings.
     select
-        trim(cast(customer_id as varchar)) as customer_id,
-        trim(cast(subscription_id as varchar)) as subscription_id,
-        cast(nullif(trim(cast(from_date as varchar)), '') as date) as from_date,
-        cast(nullif(trim(cast(to_date as varchar)), '') as date) as to_date
+        trim(cast(customer_id as string)) as customer_id,
+        trim(cast(subscription_id as string)) as subscription_id,
+        safe.parse_date('%Y-%m-%d', nullif(trim(cast(from_date as string)), '')) as from_date,
+        safe.parse_date('%Y-%m-%d', nullif(trim(cast(to_date as string)), '')) as to_date
     from source
 ),
 flagged as (

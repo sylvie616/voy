@@ -5,3 +5,4 @@ target/
 dbt_packages/
 .env
 .env.*
+dbt_internal_packages/
