@@ -1,0 +1,29 @@
+name: 'voy'
+version: '1.0.0'
+config-version: 2
+
+profile: 'voy'
+
+model-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  voy:
+    +materialized: table
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: table
+    marts:
+      +materialized: table
+
+seeds:
+  voy:
+    +quote_columns: false
+flags:
+  require_generic_test_arguments_property: true

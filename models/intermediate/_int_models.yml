@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: int_customer_master
+    description: Canonical customer master used throughout the retention model. This table combines customer identity, acquisition taxonomy, and valid activity history into one stable entity used for customer-level analytics.
+    columns:
+      - name: customer_id
+        description: Stable customer key used across all downstream models.
+        tests:
+          - not_null
+          - unique
+      - name: customer_country
+        description: Standardized customer country dimension.
+      - name: taxonomy_business_category_group
+        description: Canonical acquisition category assigned to the customer.
+      - name: first_seen_date
+        description: The earliest valid activity or exposure date for the customer.
+      - name: last_seen_date
+        description: The latest valid activity date used in customer-level lifecycle analysis.
+      - name: has_open_subscription
+        description: Flag indicating whether the customer has at least one valid open subscription window.
+      - name: is_active_customer
+        description: High-level customer state used in customer-level status checks.
+
+  - name: int_subscription_periods
+    description: Valid subscription interval model used to construct customer subscription lifecycles. This model splits repeated subscription IDs into separate continuous period islands, handles reactivation gaps, and calculates duration and active state for each canonical lifecycle segment.
+    columns:
+      - name: customer_id
+        description: Customer key associated with the subscription window.
+        tests:
+          - not_null
+      - name: subscription_id
+        description: Subscription identifier for the lifecycle period.
+        tests:
+          - not_null
+      - name: start_date
+        description: The start date of the subscription interval.
+      - name: end_date
+        description: The end date of the subscription interval when the period closes.
+      - name: is_active
+        description: Boolean flag marking whether the subscription period is still active.
+      - name: duration_days
+        description: Number of days between the start and end of the subscription window.
+      - name: activity_rows
+        description: Number of raw interval records rolled into the canonical subscription window.
+
+  - name: int_date_spine
+    description: Daily calendar backbone used across all retention and time-series logic. This model ensures every customer-day analysis has complete daily coverage from the analysis start date and allows zero-filled time views.
+    columns:
+      - name: date_day
+        description: The daily date value used as the calendar grain.
+        tests:
+          - not_null
+          - unique
+      - name: calendar_year
+        description: Year extracted from the date for time grouping.
+      - name: calendar_month
+        description: Month extracted from the date for monthly aggregations.
+      - name: calendar_day
+        description: Day-of-month component used for daily slicing and drilldowns.
+      - name: month_start_date
+        description: First day of the month for month-based aggregations.
+
+  - name: int_customer_day_activity
+    description: Daily customer activity fact used for retention and churn analysis. This model creates one row per customer per day from the customer's first valid activity date onward and captures active state, subscription count, and time-since-first-activity metrics.
+    columns:
+      - name: customer_id
+        description: Customer key for the daily row.
+        tests:
+          - not_null
+      - name: date_day
+        description: The date used for the customer-day state.
+      - name: first_seen_date
+        description: Customer's first valid seen date, used to anchor time-since-start measures.
+      - name: is_active_on_date
+        description: Binary flag indicating whether the customer is active on that date.
+      - name: subscription_count_on_date
+        description: Count of active subscription intervals on the date.
+      - name: days_since_first_activity
+        description: Number of days since the customer first appeared in valid activity data.
+      - name: is_new_customer
+        description: Flag marking the date of first valid activity entry.
+      - name: is_inactive_on_date
+        description: Inverse of active-state used for churn and health analysis.
+      - name: is_currently_active_customer
+        description: Customer-level active flag carried onto the daily row for easier downstream slicing.
+
+  - name: int_customer_cohort_month
+    description: Customer cohort assignment model. It attributes each customer to the month in which they entered the valid customer lifecycle and supports retention and churn comparisons by cohort.
+    columns:
+      - name: customer_id
+        description: Customer identifier included in the cohort map.
+      - name: cohort_month
+        description: Month in which the customer first entered the valid customer lifecycle.

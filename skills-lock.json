@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "skills": {
+    "adding-dbt-unit-test": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/adding-dbt-unit-test/SKILL.md",
+      "computedHash": "bddb5db02e45ff51d312cb03becea76aed8b5665bb5c1136a57d906d46be914d"
+    },
+    "answering-natural-language-questions-with-dbt": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/answering-natural-language-questions-with-dbt/SKILL.md",
+      "computedHash": "e255b80fb97739d0cca118a315e4b3b834cd09fd66488585b0af85d52bd3100a"
+    },
+    "building-dbt-semantic-layer": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/building-dbt-semantic-layer/SKILL.md",
+      "computedHash": "e9782d1e9bddbc5466986fb04e23655841b263e40edf7f11b8160f6e5ed73208"
+    },
+    "configuring-dbt-mcp-server": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/configuring-dbt-mcp-server/SKILL.md",
+      "computedHash": "d5164f64ae82d37a4c6cd8db879b3a9ae4fe13923087c680ad5477cf0795e3a0"
+    },
+    "creating-mermaid-dbt-dag": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt-extras/skills/creating-mermaid-dbt-dag/SKILL.md",
+      "computedHash": "10b96e5df5a68562ea40277e3b520759a406713a97052d1bc6f3c47a81dcbe83"
+    },
+    "fetching-dbt-docs": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/fetching-dbt-docs/SKILL.md",
+      "computedHash": "9307671c6d29eec85e7d8b180f00d1aa99d67998c6d06c965b15ebd1b8815652"
+    },
+    "migrating-dbt-core-to-fusion": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt-migration/skills/migrating-dbt-core-to-fusion/SKILL.md",
+      "computedHash": "4f83f0bc6be2b0dff01402cc0c441d2d2cdbe1ed3e2c892ba570dc27533ce29b"
+    },
+    "migrating-dbt-project-across-platforms": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt-migration/skills/migrating-dbt-project-across-platforms/SKILL.md",
+      "computedHash": "2f91bcc0f03423ea4d3a5c06613bef98a1c7a285c8bd5eb9ffdacc5034172c10"
+    },
+    "running-dbt-commands": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/running-dbt-commands/SKILL.md",
+      "computedHash": "a654746b761c55f222e269bc5feca042a2f90ce983c35e82bc25433e95e308eb"
+    },
+    "troubleshooting-dbt-job-errors": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/troubleshooting-dbt-job-errors/SKILL.md",
+      "computedHash": "4632c53f3e80361176dc1f9238499850488d4f29a76cb3bbec82d8f755fda151"
+    },
+    "upgrading-dbt-core": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt-migration/skills/upgrading-dbt-core/SKILL.md",
+      "computedHash": "85d3c5af90d79cbc3b9a8c7fb5e10aee24be555cd6beee32f21a58ff97c7b0c8"
+    },
+    "using-dbt-for-analytics-engineering": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/using-dbt-for-analytics-engineering/SKILL.md",
+      "computedHash": "ef92391e476c262ba1a5fb3dff766476ec9df639b630960a07af5214f4036e29"
+    },
+    "using-dbt-state": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/using-dbt-state/SKILL.md",
+      "computedHash": "541c8ce2b6f87c11e8c60f9f44297b8224f4762ae1cfab24d2d371d8a945845f"
+    },
+    "working-with-dbt-mesh": {
+      "source": "dbt-labs/dbt-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dbt/skills/working-with-dbt-mesh/SKILL.md",
+      "computedHash": "738e1c9af3e83bba543e5b72b72c9c468485a3cac74b65abea659ec78a9322de"
+    }
+  }
+}

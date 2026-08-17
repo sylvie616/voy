@@ -1,0 +1,157 @@
+# VOY retention analytics dbt project
+
+This project builds an analytics engineering foundation for VOY customer retention, acquisition quality, and lifecycle analysis using the raw CSV files in the workspace.
+
+## Objective
+
+The goal is not simply to reshape three files into a reporting table. Instead, the project implements a modular dbt architecture that supports:
+
+- customer retention analysis by cohort and time
+- acquisition taxonomy quality analysis
+- customer activity and churn diagnostics
+- operational product and clinical intervention windows
+- trusted executive KPI reporting
+
+## Architecture
+
+The project uses a medallion-style build:
+
+- Staging: source-aligned, cleaned 1:1 representations of the raw seeds
+- Intermediate: business logic, interval validation, date spine, and cohort assignment
+- Marts: dimension and fact tables for downstream analysis and BI consumption
+
+## Source files
+
+The project loads the following seed files:
+
+- `customers.csv` — customer master data
+- `acq_orders.csv` — acquisition taxonomy / customer category mapping
+- `activity.csv` — customer subscription lifecycle activity with start and end dates
+
+## Model summary
+
+### Staging models
+
+- `stg_customers`: clean customer IDs and normalize country values
+- `stg_acq_orders`: standardize acquisition taxonomy and remove duplicate customer-category rows
+- `stg_activity`: cast activity dates and flag invalid subscription intervals
+- `stg_activity_quarantine`: isolate invalid rows excluded from valid retention logic
+
+### Intermediate models
+
+- `int_customer_master`: canonical customer-level master with acquisition and first/last activity metadata
+- `int_subscription_periods`: valid subscription interval model with duration and active-state logic
+- `int_date_spine`: daily calendar backbone used for retention and time analyses
+- `int_customer_day_activity`: core daily customer fact used for churn and retention curve analysis
+- `int_customer_cohort_month`: month-level cohort assignment used to compare retention by cohort
+
+### Mart models
+
+- `dim_customer`: customer dimension used for segmentation and slicing
+- `dim_date`: calendar dimension for time-level analysis
+- `fct_subscription_period`: subscription lifecycle fact table
+- `fct_customer_daily`: daily customer activity fact for analytics and operational retention work
+- `fct_customer_cohort_retention`: cohort retention curve by month offset
+
+## Key business logic
+
+### Active status rule
+
+Customer activity is treated as a binary state at the customer-day grain. The number of subscriptions does not define whether a customer is active. This is intentional and matches the project brief.
+
+### Retention logic
+
+The core retention metric is derived from the daily activity fact. This enables analytics at the appropriate granularity for:
+
+- day-level retention cliffs
+- weekly/monthly summaries
+- cohort retention curves
+- acquisition-category comparisons
+
+## Data quality handling
+
+The project explicitly manages common quality issues including:
+
+- casing and whitespace normalization
+- duplicate customer records
+- invalid or inverted date ranges
+- open-ended intervals
+- orphaned customer keys and unmatched activity rows
+
+Invalid records are quarantined rather than silently dropped so the business can audit issues without corrupting the trusted reporting layer.
+
+## KPI definitions
+
+The project is designed around a small set of core metrics that are reusable across product, marketing, and executive reporting.
+
+### Active Customers
+
+**Definition:** Count of customers with `is_active_on_date = 1` on a given date.
+
+**Purpose:** Tracks customer health over time and reveals onboarding and retention cliffs.
+
+**Source:** `fct_customer_daily`
+
+### Active Subscribers
+
+**Definition:** Daily or rolling count of customers who are active according to the binary customer activity rule, regardless of how many subscriptions they hold.
+
+**Purpose:** Represents the cleanest operational and executive measure of customer engagement.
+
+### Retention Rate
+
+**Definition:** For a given cohort and month offset, the ratio of customers still active at that time relative to the original cohort size.
+
+**Formula:** `active_customers / cohort_size`
+
+**Purpose:** Shows how well a cohort performs over time and highlights the shape of churn behavior by acquisition period.
+
+**Source:** `fct_customer_cohort_retention`
+
+### Churn Rate
+
+**Definition:** Share of customers who are no longer active within a defined period relative to the prior active base.
+
+**Purpose:** Indicates whether the business is retaining customers through key lifecycle moments.
+
+### New Customers
+
+**Definition:** Count of customers with `is_new_customer = 1` on the relevant date.
+
+**Purpose:** Measures acquisition volume and supports campaign and acquisition-taxonomy analysis.
+
+### Acquisition Category Performance
+
+**Definition:** Measures of new customer counts and retention quality by acquisition taxonomy such as Hair Loss Group, ED Group, Weight Loss Group, and others.
+
+**Purpose:** Helps marketing and commercial teams compare quality of acquisition by category, not just volume.
+
+### Customer Cohort
+
+**Definition:** Customers grouped by their first valid activity / acquisition month.
+
+**Purpose:** Allows fair comparison of retention and churn by acquisition period and segmentation.
+
+## Testing and validation
+
+The project includes dbt tests for:
+
+- primary key uniqueness
+- not-null integrity
+- relationship-level sanity checks
+- date-based validity checks
+
+## Production interpretation
+
+In a production environment, this design would be deployed to BigQuery or an equivalent warehouse while preserving the same model logic. The local DuckDB setup is intended for rapid validation and interview-style prototyping.
+
+## Why this design
+
+This is intentionally designed as a reusable analytics layer rather than a single reporting view. It supports:
+
+- product and clinical operations decisions
+- marketing acquisition quality analysis
+- executive retention monitoring
+- future AI-driven intervention and risk analysis
+
+The architecture creates an explicit separation between source data, derived business logic, and consumer-ready mart tables so the business can trust the outputs and the analysts can iterate without damaging the data contract.

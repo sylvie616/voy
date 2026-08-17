@@ -1,0 +1,100 @@
+version: 2
+
+models:
+  - name: dim_customer
+    description: Customer dimension used throughout the reporting layer. This table provides the clean customer master and the key attributes needed for segmentation, retention, and acquisition analysis.
+    columns:
+      - name: customer_id
+        description: Stable customer identifier used as the dimension key.
+        tests:
+          - not_null
+          - unique
+      - name: customer_country
+        description: Country dimension used for geographic segmentation.
+      - name: taxonomy_business_category_group
+        description: Acquisition taxonomy used for marketing and commercial quality analysis.
+      - name: first_seen_date
+        description: Earliest valid activity date for the customer.
+      - name: last_seen_date
+        description: Latest valid activity date for the customer.
+      - name: has_open_subscription
+        description: Flag that indicates whether the customer currently has an open subscription window.
+      - name: is_active_customer
+        description: Current aggregate active-state used for high-level customer segmentation.
+
+  - name: dim_date
+    description: Time dimension used across the reporting layer. This table provides the canonical calendar fields used for cohort curves, trend analysis, and time-based reporting, with weekend flags aligned to DuckDB's `dayofweek` mapping (Saturday and Sunday are treated as weekend days).
+    columns:
+      - name: date_day
+        description: Day-level date key.
+        tests:
+          - not_null
+          - unique
+      - name: calendar_year
+        description: Year extracted from the date table.
+      - name: calendar_month
+        description: Month value used for monthly slicers.
+      - name: calendar_day
+        description: Day-of-month value used for daily analysis.
+      - name: month_start_date
+        description: First day of the month for month-based rollups.
+      - name: is_weekend
+        description: Boolean flag used to separate weekend vs weekday views and aligned to the warehouse's day-of-week semantics.
+
+  - name: fct_subscription_period
+    description: Subscription lifecycle fact table. This table captures each valid subscription period and provides the underlying lifecycle detail that informs retention, churn analysis, and operational interventions.
+    columns:
+      - name: customer_id
+        description: Customer key associated with the subscription lifecycle row.
+      - name: subscription_id
+        description: Subscription identifier for the lifecycle period.
+      - name: start_date
+        description: Start date of the subscription interval.
+      - name: end_date
+        description: End date of the subscription interval, where applicable.
+      - name: duration_days
+        description: Number of days between subscription start and end.
+      - name: is_active
+        description: Boolean for whether the subscription period is still active.
+      - name: activity_rows
+        description: Number of underlying activity rows folded into the canonical subscription period.
+
+  - name: fct_customer_daily
+    description: Primary daily customer activity fact table for retention analysis. One row exists per customer per day, with a binary active-state definition and supporting metrics used for retention cliffs and churn diagnostics.
+    columns:
+      - name: customer_id
+        description: Customer key for the customer-day row.
+        tests:
+          - not_null
+      - name: date_day
+        description: The date represented by the customer-day row.
+        tests:
+          - not_null
+      - name: is_active_on_date
+        description: Binary flag indicating if the customer is active on that date.
+      - name: subscription_count_on_date
+        description: Count of active subscriptions on that date.
+      - name: days_since_first_activity
+        description: Time in days since the customer first appeared in valid activity data.
+      - name: is_new_customer
+        description: Flag indicating the day the customer entered the valid activity set.
+      - name: is_inactive_on_date
+        description: Complement of active-state for churn and trend analysis.
+      - name: customer_country
+        description: Geography associated with the customer record.
+      - name: taxonomy_business_category_group
+        description: Acquisition category associated with the customer.
+
+  - name: fct_customer_cohort_retention
+    description: Cohort retention fact table. This model aggregates the daily activity base into retention curves by cohort and month offset so product, marketing, and leadership teams can compare retention quality over time.
+    columns:
+      - name: cohort_month
+        description: Month of cohort formation used to benchmark performance.
+      - name: month_index
+        description: Month offset relative to the cohort start date.
+      - name: cohort_size
+        description: Number of customers in the original cohort.
+      - name: active_customers
+        description: Number of customers still active at the month offset.
+      - name: retention_rate
+        description: Ratio of active customers to cohort size at a given month offset.

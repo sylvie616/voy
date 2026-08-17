@@ -1,0 +1,57 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Cleaned customer dimension seeded from the raw customer file. This model standardizes country names, trims whitespace, and resolves duplicate customer IDs through a deterministic precedence rule so downstream customer-level analysis is stable and auditable.
+    columns:
+      - name: customer_id
+        description: Stable customer identifier used to join the customer dimension to acquisition and activity data.
+        tests:
+          - not_null
+          - unique
+      - name: customer_country
+        description: Normalized customer country value mapped to the canonical VOY dimension values.
+      - name: loaded_at
+        description: Timestamp of the load used for lineage checks and tie-breaking during duplicate resolution.
+
+  - name: stg_acq_orders
+    description: Cleaned acquisition-category model keyed at customer level. The model standardizes category strings and resolves duplicate customer-taxonomy rows using a deterministic, reviewable precedence rule so category assignments remain consistent for marketing analysis.
+    columns:
+      - name: customer_id
+        description: Customer identifier linked to the customer master and activity stream.
+        tests:
+          - not_null
+      - name: taxonomy_business_category_group
+        description: Canonical acquisition category assigned to the customer, used for acquisition quality and category-performance analysis.
+
+  - name: stg_activity
+    description: Source-aligned activity model with interval validity flags. This model casts raw dates to DATE and separates malformed or invalid windows from the valid retention stream.
+    columns:
+      - name: customer_id
+        description: Customer identifier associated with the activity interval.
+        tests:
+          - not_null
+      - name: subscription_id
+        description: Subscription identifier representing the service lifecycle period for the customer.
+      - name: from_date
+        description: Subscription start date.
+        tests:
+          - not_null
+      - name: to_date
+        description: Subscription end date, where present. Empty or null values represent open or ongoing intervals.
+      - name: is_valid_interval
+        description: Flag used to separate valid and invalid activity intervals before retention logic is applied.
+
+  - name: stg_activity_quarantine
+    description: Exception model for malformed, invalid, or orphaned subscription records. This model is used for operational review and does not feed active-state or retention metrics.
+    columns:
+      - name: customer_id
+        description: Customer key from the invalid interval record.
+      - name: subscription_id
+        description: Subscription key from the invalid interval record.
+      - name: from_date
+        description: Start date from the invalid interval record.
+      - name: to_date
+        description: End date from the invalid interval record where present.
+      - name: is_valid_interval
+        description: Hard-coded invalid flag used to identify quarantine rows.

@@ -1,0 +1,7 @@
+.agents/
+.vscode/
+logs/
+target/
+dbt_packages/
+.env
+.env.*
