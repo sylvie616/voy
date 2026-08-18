@@ -13,18 +13,6 @@ normalized as (
         trim(cast(customer_id as string)) as customer_id,
         nullif(trim(taxonomy_business_category_group), '') as taxonomy_business_category_group
     from source
-),
-deduped as (
-    -- purpose: resolve duplicate customer classification rows; why: one customer should map to one canonical acquisition taxonomy for trustworthy marketing analysis.
-    select
-        *,
-        row_number() over (
-            partition by customer_id
-            order by
-                taxonomy_business_category_group is not null desc,
-                taxonomy_business_category_group asc
-        ) as row_num
-    from normalized
 )
 select
     customer_id,
@@ -32,5 +20,11 @@ select
         when taxonomy_business_category_group is null then 'Unknown'
         else trim(taxonomy_business_category_group)
     end as taxonomy_business_category_group
-from deduped
-where row_num = 1
+from normalized
+-- purpose: resolve duplicate customer classification rows; why: one customer should map to one canonical acquisition taxonomy for trustworthy marketing analysis.
+qualify row_number() over (
+    partition by customer_id
+    order by
+        taxonomy_business_category_group is not null desc,
+        taxonomy_business_category_group asc
+) = 1

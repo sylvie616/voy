@@ -27,6 +27,8 @@ period_islands as (
     -- purpose: split repeated subscription IDs into separate lifecycle islands when a gap is detected; why: otherwise a reactivated or repeated subscription can be merged into a single invalid period.
     select
         *,
+        -- purpose: start a new period whenever the current interval begins after the prior interval ended,
+        -- with the +1 day buffer treating adjacent dates as the same continuous subscription period.
         case
             when previous_end_date is null then 1
             when start_date > date_add(previous_end_date, interval 1 day) then 1

@@ -18,14 +18,15 @@ deduped as (
     -- purpose: keep one record per customer using a deterministic precedence rule; why: prevents duplicate rows from creating conflicting customer identities.
     -- tiebreak rule: prefer rows with a non-null country; where both are non-null, alphabetical order is the accepted last-resort deterministic rule.
     select
-        *,
-        row_number() over (
-            partition by customer_id
-            order by
-                customer_country is not null desc,
-                customer_country asc
-        ) as row_num
+        customer_id,
+        customer_country
     from normalized
+    qualify row_number() over (
+        partition by customer_id
+        order by
+            customer_country is not null desc,
+            customer_country asc
+    ) = 1
 )
 select
     customer_id,
@@ -36,4 +37,3 @@ select
         else trim(customer_country)
     end as customer_country
 from deduped
-where row_num = 1

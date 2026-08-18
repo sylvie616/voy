@@ -26,6 +26,8 @@ flagged as (
     -- purpose: mark valid vs invalid intervals; why: the retention model must exclude malformed windows without losing them for audit and remediation.
     select
         *,
+        -- validity rule: keep only records with non-empty identifiers, a usable start date, and a date window that does not end before it begins.
+        -- this blocks malformed or contradictory intervals from downstream retention calculations while preserving the raw fields for audit.
         case
             when customer_id is null or customer_id = '' then 0
             when subscription_id is null or subscription_id = '' then 0
