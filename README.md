@@ -47,11 +47,26 @@ Raw source tables are loaded in BigQuery (`voy-task.lz_ae_task`):
 
 ### Mart models
 
-- `dim_customer`: customer dimension used for segmentation and slicing
+- `dim_customer`: used by analysts and BI for segmentation
 - `dim_date`: calendar dimension for time-level analysis
-- `fct_subscription_period`: subscription lifecycle fact table
-- `fct_customer_daily`: daily customer activity fact for analytics and operational retention work
-- `fct_customer_cohort_retention`: cohort retention curve by month offset
+- `fct_subscription_period`: used for lifecycle / renewal analysis
+- `fct_customer_daily`: used for retention and customer health dashboards
+- `fct_customer_cohort_retention`: used for cohort comparison and acquisition quality
+
+### Commercial outcomes and stakeholders
+
+- **Product:** use the daily activity and cohort models to identify drop-off points, onboarding friction, and retention cliffs.
+- **Marketing:** compare acquisition quality by channel/category and focus spend on the cohorts that retain best.
+- **Leadership / Finance:** rely on a single source of truth for active customers, retention, and cohort performance.
+
+### Useful graphs and charts
+
+- Daily active customers over time
+- Retention cliff chart by cohort month
+- Cohort heatmap of retention rates by month offset
+- Active vs inactive customer trend
+- Acquisition quality comparison by taxonomy/category
+- Subscription lifecycle timeline / renewal window view
 
 ## Key business logic
 
