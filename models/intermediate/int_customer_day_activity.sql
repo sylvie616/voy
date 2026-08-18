@@ -34,6 +34,8 @@ activity_daily as (
         cd.customer_id,
         cd.date_day,
         cd.first_seen_date,
+        cd.customer_country,
+        cd.taxonomy_business_category_group,
         cd.is_active_customer,
         count(a.subscription_id) as subscription_count_on_date,
         max(case when cd.date_day between a.start_date and a.effective_end_date then 1 else 0 end) as is_active_on_date
@@ -42,7 +44,13 @@ activity_daily as (
     left join activity_intervals a
         on a.customer_id = cd.customer_id
        and cd.date_day between a.start_date and a.effective_end_date
-    group by cd.customer_id, cd.date_day, cd.first_seen_date, cd.is_active_customer
+    group by
+       cd.customer_id,
+       cd.date_day,
+       cd.first_seen_date,
+       cd.customer_country,
+       cd.taxonomy_business_category_group,
+       cd.is_active_customer
 ),
 final as (
     -- purpose: finalize customer-day metrics; why: the daily fact must expose premium analytic measures such as active state, days since first activity, and first-day flags.
@@ -50,6 +58,8 @@ final as (
         customer_id,
         date_day,
         first_seen_date,
+        customer_country,
+        taxonomy_business_category_group,
         is_active_customer,
         coalesce(is_active_on_date, 0) as is_active_on_date,
         coalesce(subscription_count_on_date, 0) as subscription_count_on_date,
